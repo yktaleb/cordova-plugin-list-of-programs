@@ -10,10 +10,27 @@ public class Hello extends CordovaPlugin {
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
 
         if (action.equals("greet")) {
+            List<String> programs = new ArrayList<String>();
 
-            String name = data.getString(0);
-            String message = "Hello, " + name;
-            callbackContext.success(message);
+            PackageManager packageManager = this.getApplicationContext().getPackageManager();
+            List<ApplicationInfo> installedApplications = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+
+            ArrayList <ApplicationInfo> applicationInfos = new ArrayList<>();
+
+            for (ApplicationInfo installedApplication : installedApplications) {
+                if (packageManager.getLaunchIntentForPackage(installedApplication.packageName) != null){
+                    applicationInfos.add(installedApplication);
+                }
+            }
+
+            for (ApplicationInfo applicationInfo : applicationInfos) {
+                programs.add(applicationInfo.loadLabel(packageManager).toString());
+                programs.add("\n");
+            }
+
+//            System.out.println(programs);
+
+            callbackContext.success(programs.toString);
 
             return true;
 
